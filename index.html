@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Korea Road Trip — Sae & Hee Jin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1410;
+    --paper: #f5ede0;
+    --paper-dark: #ede0cc;
+    --red: #c0392b;
+    --red-light: #e8d5d3;
+    --gold: #b8860b;
+    --muted: #7a6a58;
+    --border: #d4c4ae;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    background-image: repeating-linear-gradient(
+      0deg, transparent, transparent 27px,
+      rgba(180,160,130,0.15) 27px, rgba(180,160,130,0.15) 28px
+    );
+  }
+
+  /* HEADER */
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '한국';
+    position: absolute;
+    top: -10px; right: 20px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 7rem;
+    color: rgba(255,255,255,0.04);
+    font-weight: 300;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .header-eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+  header h1 {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1.1;
+  }
+  header h1 span { color: #c87060; }
+  .header-sub {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    color: rgba(245,237,224,0.5);
+    font-style: italic;
+    font-weight: 300;
+  }
+  .header-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat-number {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--paper);
+    display: block;
+  }
+  .stat-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(245,237,224,0.45);
+  }
+
+  /* LAYOUT */
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+  }
+
+  /* FORM */
+  .new-entry-section {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 1.75rem;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    position: relative;
+  }
+  .new-entry-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: var(--red);
+    border-radius: 2px 0 0 2px;
+  }
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  input[type="text"], input[type="date"], select, textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: var(--paper);
+    padding: 0.55rem 0.75rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--red);
+    background: white;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.7;
+  }
+
+  /* PHOTO UPLOAD */
+  .photo-upload-area {
+    border: 1.5px dashed var(--border);
+    border-radius: 2px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: var(--paper);
+    position: relative;
+  }
+  .photo-upload-area:hover { border-color: var(--red); background: white; }
+  .photo-upload-area input[type="file"] {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer;
+    width: 100%; height: 100%;
+    padding: 0; border: none; background: none;
+  }
+  .photo-upload-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    pointer-events: none;
+  }
+  .photo-upload-label span { color: var(--red); }
+  .photo-previews {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+  }
+  .photo-preview-item {
+    position: relative;
+    width: 72px; height: 72px;
+  }
+  .photo-preview-item img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+  }
+  .photo-remove {
+    position: absolute;
+    top: -5px; right: -5px;
+    width: 18px; height: 18px;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+  }
+
+  /* MOOD BUTTONS */
+  .mood-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .mood-btn {
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--border);
+    background: var(--paper);
+    border-radius: 100px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+  }
+  .mood-btn.active { background: var(--red); border-color: var(--red); color: white; }
+  .mood-btn:hover:not(.active) { border-color: var(--red); color: var(--red); }
+
+  .submit-btn {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .submit-btn:hover { background: var(--red); }
+
+  /* ENTRIES */
+  .entries-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+  .entries-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .entry-count {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--red);
+  }
+  .entries-list { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .entry-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    position: relative;
+    animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .entry-card:hover { box-shadow: 0 3px 14px rgba(0,0,0,0.08); }
+
+  /* PHOTO STRIP on card */
+  .entry-photo-strip {
+    display: flex;
+    gap: 2px;
+    height: 160px;
+    overflow: hidden;
+  }
+  .entry-photo-strip img {
+    flex: 1;
+    object-fit: cover;
+    min-width: 0;
+  }
+
+  .entry-body-section { padding: 1.5rem; }
+
+  .entry-meta {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    gap: 1rem;
+  }
+  .entry-date-block { flex-shrink: 0; }
+  .entry-day-num {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--red);
+    line-height: 1;
+  }
+  .entry-date-text {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+  .entry-title {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.3;
+    flex: 1;
+  }
+  .entry-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
+  }
+  .entry-location-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .entry-location-link:hover { color: var(--red); }
+  .entry-location-link::before { content: '📍'; font-size: 0.7rem; }
+  .entry-mood-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 100px;
+    background: var(--red-light);
+    color: var(--red);
+    border: 1px solid rgba(192,57,43,0.2);
+  }
+  .entry-meal-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.72rem;
+    color: var(--gold);
+    background: #fdf6e3;
+    border: 1px solid #e8d49e;
+    padding: 0.2rem 0.6rem;
+    border-radius: 100px;
+  }
+  .entry-body {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: #2a221a;
+    white-space: pre-wrap;
+    border-top: 1px solid var(--paper-dark);
+    padding-top: 0.75rem;
+  }
+  .entry-actions {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 10;
+  }
+  .delete-btn {
+    background: rgba(255,255,255,0.85);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 0.75rem;
+    line-height: 1;
+    padding: 0.3rem 0.5rem;
+    border-radius: 2px;
+    transition: all 0.15s;
+  }
+  .delete-btn:hover { color: var(--red); border-color: var(--red); }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--muted);
+  }
+  .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+  .empty-state p { font-style: italic; font-size: 0.9rem; font-weight: 300; }
+
+  footer {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.7rem;
+    color: var(--border);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 500px) {
+    .form-row { grid-template-columns: 1fr; }
+    .header-stats { gap: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">Travel Journal</div>
+  <h1>Korea Road Trip<br><span>Sae &amp; Hee Jin</span></h1>
+  <div class="header-sub">June 4 – June 25, 2026 &nbsp;·&nbsp; 이야기를 기록하며</div>
+  <div class="header-stats">
+    <div class="stat">
+      <span class="stat-number" id="stat-days">0</span>
+      <span class="stat-label">Days logged</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number" id="stat-places">0</span>
+      <span class="stat-label">Places visited</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number" id="stat-photos">0</span>
+      <span class="stat-label">Photos</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number" id="stat-words">0</span>
+      <span class="stat-label">Words written</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- FORM -->
+  <div class="new-entry-section">
+    <div class="section-label">New entry</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="entry-date">
+      </div>
+      <div class="form-group">
+        <label>Location / City</label>
+        <input type="text" id="entry-location" placeholder="e.g. Gyeongju, Busan…">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group full">
+        <label>Entry title</label>
+        <input type="text" id="entry-title" placeholder="A title for this day…">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group full">
+        <label>What happened today?</label>
+        <textarea id="entry-body" placeholder="Write about your day — the people, the sights, the moments with Hee Jin…"></textarea>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group full">
+        <label>🍽 Favourite meal of the day</label>
+        <input type="text" id="entry-meal" placeholder="e.g. Haemul pajeon at Gwangjang Market…">
+      </div>
+    </div>
+
+    <div class="form-row" style="margin-bottom:0.75rem;">
+      <div class="form-group full">
+        <label>📸 Photos (up to 6)</label>
+        <div class="photo-upload-area" id="photo-drop-area">
+          <input type="file" id="photo-input" accept="image/*" multiple>
+          <div class="photo-upload-label">Tap to add photos &nbsp;·&nbsp; <span>up to 6 images</span></div>
+        </div>
+        <div class="photo-previews" id="photo-previews"></div>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top: 0.25rem;">
+      <label>Mood / Vibe</label>
+      <div class="mood-row" id="mood-row">
+        <button class="mood-btn" data-mood="✨ Magical">✨ Magical</button>
+        <button class="mood-btn" data-mood="😌 Peaceful">😌 Peaceful</button>
+        <button class="mood-btn" data-mood="🤩 Excited">🤩 Excited</button>
+        <button class="mood-btn" data-mood="🤣 Funny">🤣 Funny</button>
+        <button class="mood-btn" data-mood="🥹 Emotional">🥹 Emotional</button>
+        <button class="mood-btn" data-mood="🥱 Tired">🥱 Tired</button>
+        <button class="mood-btn" data-mood="🌧️ Rainy day">🌧️ Rainy day</button>
+        <button class="mood-btn" data-mood="🍜 Food focused">🍜 Food focused</button>
+      </div>
+    </div>
+
+    <button class="submit-btn" onclick="addEntry()">Save Entry →</button>
+  </div>
+
+  <!-- ENTRIES -->
+  <div class="entries-header">
+    <span class="entries-label">Journey so far</span>
+    <span class="entry-count" id="entry-count">0 entries</span>
+  </div>
+
+  <div class="entries-list" id="entries-list">
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">🗺️</div>
+      <p>Your journey begins here.<br>Write your first entry above.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>Sae &amp; Hee Jin · Korea 2026 · 모든 순간을 기억하며</footer>
+
+<script>
+  let entries = [];
+  let selectedMood = '';
+  let pendingPhotos = []; // array of base64 strings
+
+  const STORAGE_KEY = 'korea-roadtrip-journal-v2';
+
+  window.addEventListener('DOMContentLoaded', () => {
+    loadEntries();
+    setDefaultDate();
+    setupMoodButtons();
+    setupPhotoInput();
+    renderAll();
+  });
+
+  function setDefaultDate() {
+    document.getElementById('entry-date').value = new Date().toISOString().split('T')[0];
+  }
+
+  function setupMoodButtons() {
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mood = btn.dataset.mood;
+        if (selectedMood === mood) {
+          selectedMood = '';
+          btn.classList.remove('active');
+        } else {
+          document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+          selectedMood = mood;
+          btn.classList.add('active');
+        }
+      });
+    });
+  }
+
+  // ── PHOTO HANDLING ──
+  function setupPhotoInput() {
+    const input = document.getElementById('photo-input');
+    input.addEventListener('change', handlePhotoFiles);
+  }
+
+  function handlePhotoFiles(e) {
+    const files = Array.from(e.target.files);
+    const remaining = 6 - pendingPhotos.length;
+    const toProcess = files.slice(0, remaining);
+
+    toProcess.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        // Compress/resize before storing
+        resizeImage(ev.target.result, 1200, 0.82, dataUrl => {
+          pendingPhotos.push(dataUrl);
+          renderPhotoPreview();
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+    // reset input so same file can be re-added after removal
+    e.target.value = '';
+  }
+
+  function resizeImage(src, maxW, quality, cb) {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxW / img.width);
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = src;
+  }
+
+  function renderPhotoPreview() {
+    const container = document.getElementById('photo-previews');
+    container.innerHTML = '';
+    pendingPhotos.forEach((src, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'photo-preview-item';
+      wrap.innerHTML = `
+        <img src="${src}" alt="Photo ${i+1}">
+        <button class="photo-remove" onclick="removePhoto(${i})">✕</button>
+      `;
+      container.appendChild(wrap);
+    });
+    const area = document.getElementById('photo-drop-area');
+    area.querySelector('.photo-upload-label').innerHTML =
+      pendingPhotos.length >= 6
+        ? 'Max 6 photos reached'
+        : `${pendingPhotos.length} photo${pendingPhotos.length !== 1 ? 's' : ''} added &nbsp;·&nbsp; <span>tap to add more</span>`;
+  }
+
+  function removePhoto(idx) {
+    pendingPhotos.splice(idx, 1);
+    renderPhotoPreview();
+  }
+
+  // ── STORAGE ──
+  function saveEntries() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); } catch(e) {}
+  }
+  function loadEntries() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) entries = JSON.parse(raw);
+    } catch(e) { entries = []; }
+  }
+
+  // ── ADD ENTRY ──
+  function addEntry() {
+    const date     = document.getElementById('entry-date').value;
+    const location = document.getElementById('entry-location').value.trim();
+    const title    = document.getElementById('entry-title').value.trim();
+    const body     = document.getElementById('entry-body').value.trim();
+    const meal     = document.getElementById('entry-meal').value.trim();
+
+    if (!date || !body) { alert('Please add at least a date and some notes.'); return; }
+
+    entries.unshift({
+      id: Date.now(),
+      date,
+      location: location || 'Korea',
+      title: title || 'Day on the road',
+      body,
+      meal,
+      mood: selectedMood,
+      photos: [...pendingPhotos],
+    });
+
+    saveEntries();
+    clearForm();
+    renderAll();
+  }
+
+  function clearForm() {
+    document.getElementById('entry-location').value = '';
+    document.getElementById('entry-title').value = '';
+    document.getElementById('entry-body').value = '';
+    document.getElementById('entry-meal').value = '';
+    selectedMood = '';
+    pendingPhotos = [];
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('photo-previews').innerHTML = '';
+    document.querySelector('.photo-upload-label').innerHTML =
+      'Tap to add photos &nbsp;·&nbsp; <span>up to 6 images</span>';
+    setDefaultDate();
+  }
+
+  // ── DELETE ──
+  function deleteEntry(id) {
+    if (!confirm('Remove this entry?')) return;
+    entries = entries.filter(e => e.id !== id);
+    saveEntries();
+    renderAll();
+  }
+
+  // ── RENDER ──
+  function renderAll() { renderEntries(); renderStats(); }
+
+  function renderStats() {
+    const count  = entries.length;
+    const places = new Set(entries.map(e => e.location)).size;
+    const photos = entries.reduce((s, e) => s + (e.photos ? e.photos.length : 0), 0);
+    const words  = entries.reduce((s, e) => s + e.body.split(/\s+/).filter(Boolean).length, 0);
+
+    document.getElementById('stat-days').textContent   = count;
+    document.getElementById('stat-places').textContent = places;
+    document.getElementById('stat-photos').textContent = photos;
+    document.getElementById('stat-words').textContent  = words >= 1000 ? (words/1000).toFixed(1)+'k' : words;
+    document.getElementById('entry-count').textContent = count === 1 ? '1 entry' : count + ' entries';
+  }
+
+  function mapsUrl(location) {
+    return 'https://www.google.com/maps/search/' + encodeURIComponent(location + ', South Korea');
+  }
+
+  function renderEntries() {
+    const list  = document.getElementById('entries-list');
+    const empty = document.getElementById('empty-state');
+    list.querySelectorAll('.entry-card').forEach(c => c.remove());
+
+    if (!entries.length) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+
+    const tripStart = new Date('2026-06-04T00:00:00');
+
+    entries.forEach(entry => {
+      const card = document.createElement('div');
+      card.className = 'entry-card';
+
+      const dateObj = new Date(entry.date + 'T00:00:00');
+      const dateStr = dateObj.toLocaleDateString('en-AU', { weekday:'short', day:'numeric', month:'long', year:'numeric' });
+      const dayNum  = Math.max(1, Math.floor((dateObj - tripStart) / 86400000) + 1);
+      const photos  = entry.photos || [];
+
+      let photoStrip = '';
+      if (photos.length) {
+        photoStrip = `<div class="entry-photo-strip">${photos.map(src =>
+          `<img src="${src}" alt="trip photo">`).join('')}</div>`;
+      }
+
+      let mealTag = '';
+      if (entry.meal) {
+        mealTag = `<span class="entry-meal-tag">🍽 ${escHtml(entry.meal)}</span>`;
+      }
+
+      let moodTag = entry.mood ? `<span class="entry-mood-tag">${escHtml(entry.mood)}</span>` : '';
+
+      card.innerHTML = `
+        ${photoStrip}
+        <div class="entry-body-section">
+          <div class="entry-actions">
+            <button class="delete-btn" onclick="deleteEntry(${entry.id})">✕ Remove</button>
+          </div>
+          <div class="entry-meta">
+            <div class="entry-date-block">
+              <div class="entry-day-num">D${dayNum}</div>
+              <div class="entry-date-text">${dateStr}</div>
+            </div>
+            <div class="entry-title">${escHtml(entry.title)}</div>
+          </div>
+          <div class="entry-tags">
+            <a class="entry-location-link" href="${mapsUrl(entry.location)}" target="_blank" rel="noopener">${escHtml(entry.location)}</a>
+            ${moodTag}
+            ${mealTag}
+          </div>
+          <div class="entry-body">${escHtml(entry.body)}</div>
+        </div>
+      `;
+
+      list.appendChild(card);
+    });
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
