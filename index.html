@@ -405,8 +405,12 @@
   window.verifyPin = function() {
     const entered = [0,1,2,3].map(i => document.getElementById('pin-'+i).value).join('');
     if (entered === EDIT_PIN) {
-      closePinModal();
-      if (pinCallback) { pinCallback(); pinCallback = null; }
+      // Save callback before closing (closePinModal nulls it)
+      const cb = pinCallback;
+      pinCallback = null;
+      document.getElementById('pin-modal').classList.remove('open');
+      document.body.style.overflow = '';
+      if (cb) cb();
     } else {
       document.getElementById('pin-error').textContent = 'Incorrect PIN. Try again.';
       [0,1,2,3].forEach(i => { document.getElementById('pin-'+i).value = ''; });
