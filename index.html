@@ -394,9 +394,12 @@
     pinCallback = cb;
     [0,1,2,3].forEach(i => { document.getElementById('pin-'+i).value = ''; });
     document.getElementById('pin-error').textContent = '';
-    document.getElementById('pin-modal').classList.add('open');
+    // Ensure pin modal is on top of everything
+    const modal = document.getElementById('pin-modal');
+    modal.style.zIndex = '3000';
+    modal.classList.add('open');
     document.body.style.overflow = 'hidden';
-    setTimeout(() => document.getElementById('pin-0').focus(), 100);
+    setTimeout(() => document.getElementById('pin-0').focus(), 150);
   };
 
   window.verifyPin = function() {
@@ -415,6 +418,13 @@
     document.getElementById('pin-modal').classList.remove('open');
     document.body.style.overflow = '';
     pinCallback = null;
+  };
+
+  // Also ensure edit modal close restores overflow
+  window.closeEditModal = window.closeEditModal || function() {
+    document.getElementById('edit-modal').classList.remove('open');
+    document.body.style.overflow = '';
+    editingId = null; editPhotos = [];
   };
 
   // Edit PIN digit auto-advance
@@ -446,10 +456,18 @@
   setupMoodButtons();
   setupPhotoInput();
 
-  // Live listener
-  const q = query(entriesCol, orderBy('createdAt', 'desc'));
+  // Live listener — sort by entry date descending, then createdAt for same-day entries
+  const q = query(entriesCol, orderBy('date', 'desc'), orderBy('createdAt', 'desc'));
   onSnapshot(q, snap => {
     entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Client-side sort by entry date desc as fallback
+    entries.sort((a, b) => {
+      if (b.date !== a.date) return b.date.localeCompare(a.date);
+      // same date: sort by createdAt
+      const at = a.createdAt?.seconds || 0;
+      const bt = b.createdAt?.seconds || 0;
+      return bt - at;
+    });
     document.getElementById('loading-state').style.display = 'none';
     setSyncBar('synced', '● Live');
     renderAll();
