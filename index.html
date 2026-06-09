@@ -626,7 +626,10 @@
         if (p && p.url) return p;
         return null;
       }).filter(Boolean);
-      console.log('Edit photos loaded:', editPhotos.length, editPhotos.map(p => p.url ? p.url.substring(0,60) : 'file'));
+      const photoInfo = editPhotos.length === 0 
+        ? 'No photos found in this entry.'
+        : editPhotos.map((p,i) => `Photo ${i+1}: ${p.url ? p.url.substring(0,80) : 'file object'}`).join('\n');
+      alert(`Photos in this entry (${editPhotos.length}):\n\n${photoInfo}`);
       document.getElementById('edit-date').value     = entry.date || '';
       document.getElementById('edit-location').value = entry.location || '';
       document.getElementById('edit-title').value    = entry.title || '';
