@@ -456,8 +456,8 @@
   setupMoodButtons();
   setupPhotoInput();
 
-  // Live listener — sort by entry date descending, then createdAt for same-day entries
-  const q = query(entriesCol, orderBy('date', 'desc'), orderBy('createdAt', 'desc'));
+  // Live listener — single orderBy to avoid composite index requirement; client-side sort handles ordering
+  const q = query(entriesCol, orderBy('createdAt', 'desc'));
   onSnapshot(q, snap => {
     entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     // Client-side sort by entry date desc as fallback
@@ -472,7 +472,8 @@
     setSyncBar('synced', '● Live');
     renderAll();
   }, err => {
-    setSyncBar('error', '⚠ Offline');
+    console.error('Firestore error:', err.code, err.message);
+    setSyncBar('error', '⚠ Offline — ' + (err.code || 'unknown error'));
     document.getElementById('loading-state').style.display = 'none';
     document.getElementById('empty-state').style.display = 'block';
   });
