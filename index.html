@@ -619,7 +619,14 @@
       const entry = entries.find(e => e.id === id);
       if (!entry) return;
       editingId = id;
-      editPhotos = (entry.photos||[]).map(p => typeof p === 'string' ? {url: p} : p);
+      // Photos from Firestore are stored as URL strings; wrap them as {url} objects for the preview
+      const rawPhotos = entry.photos || [];
+      editPhotos = rawPhotos.map(p => {
+        if (typeof p === 'string' && p.length > 0) return { url: p };
+        if (p && p.url) return p;
+        return null;
+      }).filter(Boolean);
+      console.log('Edit photos loaded:', editPhotos.length, editPhotos.map(p => p.url ? p.url.substring(0,60) : 'file'));
       document.getElementById('edit-date').value     = entry.date || '';
       document.getElementById('edit-location').value = entry.location || '';
       document.getElementById('edit-title').value    = entry.title || '';
