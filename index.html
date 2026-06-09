@@ -420,13 +420,6 @@
     pinCallback = null;
   };
 
-  // Also ensure edit modal close restores overflow
-  window.closeEditModal = window.closeEditModal || function() {
-    document.getElementById('edit-modal').classList.remove('open');
-    document.body.style.overflow = '';
-    editingId = null; editPhotos = [];
-  };
-
   // Edit PIN digit auto-advance
   [0,1,2,3].forEach(i => {
     const el = document.getElementById('pin-'+i);
@@ -630,8 +623,11 @@
       document.getElementById('edit-meal').value     = entry.meal || '';
       document.querySelectorAll('.edit-mood-btn').forEach(b => b.classList.toggle('active', b.dataset.mood === entry.mood));
       renderPhotoPreview(editPhotos,'edit-photo-previews','edit-photo-drop-area','edit-photo-label',true);
-      document.getElementById('edit-modal').classList.add('open');
-      document.body.style.overflow = 'hidden';
+      // Small delay to let PIN modal fully close before opening edit modal
+      setTimeout(() => {
+        document.getElementById('edit-modal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }, 100);
       document.getElementById('edit-photo-input').onchange = e => handlePhotoFiles(e, editPhotos, 'edit-photo-previews', 'edit-photo-drop-area', 'edit-photo-label', true);
       document.querySelectorAll('.edit-mood-btn').forEach(btn => {
         btn.onclick = () => {
