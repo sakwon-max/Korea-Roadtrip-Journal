@@ -665,7 +665,13 @@
       let photoUrls = editPhotos.filter(p => p.url).map(p => p.url);
       if (hasNewPhotos) {
         setSyncBar('', 'Uploading photos…');
-        photoUrls = await uploadPhotos(editPhotos, editingId);
+        try {
+          photoUrls = await uploadPhotos(editPhotos, editingId);
+        } catch(uploadErr) {
+          alert('Photo upload failed: ' + (uploadErr.code || uploadErr.message || 'unknown error') + '\n\nThe text changes will still be saved without the new photos.');
+          // fall through with existing URLs only
+          photoUrls = editPhotos.filter(p => p.url).map(p => p.url);
+        }
       }
       const updated = {
         date:     document.getElementById('edit-date').value,
@@ -678,7 +684,7 @@
       };
       await updateDoc(doc(db, 'entries', editingId), updated);
       closeEditModal(); setSyncBar('synced','● Saved');
-    } catch(e) { console.error(e); setSyncBar('error','⚠ Save failed'); alert('Could not save. Check your connection.'); }
+    } catch(e) { setSyncBar('error','⚠ Save failed'); alert('Save failed: ' + (e.code || e.message || 'unknown error')); }
   };
 
   // Close modals on overlay click
