@@ -538,12 +538,33 @@
         urls.push(item.url);
       } else if (item.file) {
         // new file — resize then upload to Firebase Storage
-        const resized = await resizeImageToBlob(item.file, 1600, 0.85);
-        const path = `entries/${entryId}/${Date.now()}_${item.file.name}`;
-        const storageRef = ref(storage, path);
-        await uploadBytes(storageRef, resized);
-        const url = await getDownloadURL(storageRef);
-        urls.push(url);
+        try {
+          const resized = await resizeImageToBlob(item.file, 1600, 0.85);
+          const safeName = item.file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+          const path = `entries/${entryId}/${Date.now()}_${safeName}`;
+          const storageRef = ref(storage, path);
+          const metadata = { contentType: 'image/jpeg' };
+          await uploadBytes(storageRef, resized, metadata);
+          const url = await getDownloadURL(storageRef);
+          urls.push(url);
+        } catch(err) {
+          console.error('Failed to upload photo:', err);
+          throw err;
+        }
+      } else if (item.preview) {
+        // fallback: try uploading from preview blob URL
+        try {
+          const response = await fetch(item.preview);
+          const blob = await response.blob();
+          const path = `entries/${entryId}/${Date.now()}_photo.jpg`;
+          const storageRef = ref(storage, path);
+          await uploadBytes(storageRef, blob, { contentType: 'image/jpeg' });
+          const url = await getDownloadURL(storageRef);
+          urls.push(url);
+        } catch(err) {
+          console.error('Failed to upload from preview:', err);
+          throw err;
+        }
       }
     }
     return urls;
@@ -581,15 +602,26 @@
     if (!date || !body) { alert('Please add at least a date and some notes.'); return; }
     setSyncBar('', 'Saving…');
     try {
-      // Create entry first to get an ID, then upload photos
+      // Snapshot photos before clearing form
+      const photosToUpload = [...pendingPhotos];
+      // Create entry first to get an ID
       const entryRef = await addDoc(entriesCol, { date, location: location||'Korea', title: title||'Day on the road', body, meal, mood: selectedMood, photos: [], createdAt: serverTimestamp() });
-      if (pendingPhotos.length) {
-        setSyncBar('', `Uploading ${pendingPhotos.length} photo${pendingPhotos.length>1?'s':''}…`);
-        const photoUrls = await uploadPhotos(pendingPhotos, entryRef.id);
-        await updateDoc(entryRef, { photos: photoUrls });
-      }
+      // Clear form immediately so user can start next entry
       clearForm();
-      setSyncBar('synced', '● Saved');
+      // Then upload photos in background
+      if (photosToUpload.length) {
+        setSyncBar('', `Uploading ${photosToUpload.length} photo${photosToUpload.length>1?'s':''}…`);
+        try {
+          const photoUrls = await uploadPhotos(photosToUpload, entryRef.id);
+          await updateDoc(entryRef, { photos: photoUrls });
+          setSyncBar('synced', '● Saved');
+        } catch(uploadErr) {
+          setSyncBar('error', '⚠ Photo upload failed: ' + (uploadErr.code || uploadErr.message || 'unknown'));
+          alert('Entry saved but photos failed to upload: ' + (uploadErr.code || uploadErr.message || 'unknown error'));
+        }
+      } else {
+        setSyncBar('synced', '● Saved');
+      }
     } catch(e) { console.error(e); setSyncBar('error', '⚠ Save failed'); alert('Could not save. Check your connection.'); }
   };
 
