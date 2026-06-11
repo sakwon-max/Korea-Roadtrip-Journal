@@ -610,16 +610,14 @@
       clearForm();
       // Then upload photos in background
       if (photosToUpload.length) {
-        alert(`DEBUG: Starting upload of ${photosToUpload.length} photos. Files valid: ${photosToUpload.filter(p=>p.file).length}, URLs: ${photosToUpload.filter(p=>p.url).length}`);
         setSyncBar('', `Uploading ${photosToUpload.length} photo${photosToUpload.length>1?'s':''}…`);
         try {
           const photoUrls = await uploadPhotos(photosToUpload, entryRef.id);
-          alert(`DEBUG: Upload done. Got ${photoUrls.length} URLs: ${photoUrls[0] ? photoUrls[0].substring(0,60) : 'none'}`);
           await updateDoc(entryRef, { photos: photoUrls });
           setSyncBar('synced', '● Saved');
         } catch(uploadErr) {
-          alert('Upload error: ' + uploadErr.code + ' / ' + uploadErr.message);
           setSyncBar('error', '⚠ Photo upload failed: ' + (uploadErr.code || uploadErr.message || 'unknown'));
+          alert('Entry saved but photos failed to upload: ' + (uploadErr.code || uploadErr.message || 'unknown error'));
         }
       } else {
         setSyncBar('synced', '● Saved');
